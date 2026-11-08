@@ -20,4 +20,4 @@ COPY --from=frontend /web/dist ./web/dist
 RUN mkdir -p runs && chown -R app:app /app
 USER app
 EXPOSE 10000
-CMD ["sh", "-c", "exec uv run --no-sync uvicorn api:app --host 0.0.0.0 --port ${PORT:-10000} --proxy-headers"]
+CMD ["sh", "-c", "exec /app/.venv/bin/uvicorn api:app --host 0.0.0.0 --port ${PORT:-10000} --proxy-headers"]
