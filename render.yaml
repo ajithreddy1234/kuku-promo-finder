@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: kuku-promo-finder
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: PROMO_PUBLIC
+        value: "1"
+      - key: PROMO_SHARED_KEY
+        value: "1"
+      - key: GROQ_API_KEY
+        sync: false

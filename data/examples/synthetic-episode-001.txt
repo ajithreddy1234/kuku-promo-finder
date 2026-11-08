@@ -1,0 +1,56 @@
+EPISODE NUMBER: Episode 1
+EPISODE LOGLINE: Invented software fixture, not supplied show content.
+--- SCRIPT START ---
+SCENE 01
+Scene heading: INT. STORAGE ROOM - NIGHT
+Scene start: 00:00.00
+Scene end: 01:10.00
+**CAMERA:**
+Start: (00:00.00) | End: (01:10.00)
+A fixed view of a storage room and its locked cabinet.
+**NORA:**
+Start: (00:00.00) | End: (00:03.00)
+"Why do you have the key to my father's cabinet?"
+**ACTION:**
+Start: (00:03.00) | End: (00:05.00)
+Eli hides a key behind his back.
+**ELI:**
+Start: (00:05.00) | End: (00:09.00)
+"He asked me to keep something safe."
+**NORA:**
+Start: (00:10.00) | End: (00:14.00)
+"He has been missing for a year."
+**ACTION:**
+Start: (00:15.00) | End: (00:18.00)
+Nora places a sealed envelope on a table.
+**NORA:**
+Start: (00:20.00) | End: (00:24.00)
+"Then explain why this arrived today."
+**ELI:**
+Start: (00:25.00) | End: (00:29.00)
+"You were never supposed to open that."
+**ACTION:**
+Start: (00:30.00) | End: (00:34.00)
+Nora tears open the envelope and finds a second key.
+**NORA:**
+Start: (00:35.00) | End: (00:39.00)
+"There are two keys. What is in the other cabinet?"
+**ACTION:**
+Start: (00:40.00) | End: (00:44.00)
+Eli backs toward the door.
+**ELI:**
+Start: (00:45.00) | End: (00:49.00)
+"Ask the person who sent you that letter."
+**SOUND FX:**
+Start: (00:50.00) | End: (00:52.00)
+Three sharp knocks sound from inside the cabinet.
+**NORA:**
+Start: (00:55.00) | End: (00:58.00)
+"Someone is in there."
+**ACTION:**
+Start: (01:00.00) | End: (01:04.00)
+The cabinet handle begins to turn.
+**ELI:**
+Start: (01:05.00) | End: (01:09.00)
+"Nora, do not let them out."
+--- SCRIPT END ---

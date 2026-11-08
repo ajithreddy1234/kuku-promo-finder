@@ -1,0 +1,29 @@
+EPISODE NUMBER: Episode 901
+EPISODE LOGLINE: Entirely invented demonstration. A security recording predicts a visitor.
+--- SCRIPT START ---
+SCENE 01
+Scene heading: INT. SECURITY OFFICE - NIGHT
+Scene start: 00:00.00
+Scene end: 00:32.00
+**NORA:**
+Start: (00:00.00) | End: (00:05.00)
+"That woman on the security screen is me. I have never been in this house."
+**ELI:**
+Start: (00:05.00) | End: (00:09.00)
+"Then who is standing outside our door?"
+**ACTION:**
+Start: (00:09.00) | End: (00:14.00)
+Nora points at a timestamp on the monitor. It is thirty seconds ahead of the office clock.
+**NORA:**
+Start: (00:14.00) | End: (00:19.00)
+"This is not a recording. It shows what is about to happen."
+**SOUND FX:**
+Start: (00:19.00) | End: (00:22.00)
+Three deliberate knocks sound at the locked office door.
+**ELI:**
+Start: (00:22.00) | End: (00:26.00)
+"The monitor shows her taking a knife out of her coat."
+**ACTION:**
+Start: (00:26.00) | End: (00:32.00)
+The door handle slowly turns. Nora and Eli back away, trapped inside the office. The door begins to open, before either can see the visitor.
+--- SCRIPT END ---

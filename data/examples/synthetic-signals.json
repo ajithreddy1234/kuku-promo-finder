@@ -1,0 +1,7 @@
+[
+  {"signal_id":"S1","episode_id":"E001","kind":"hook","source_event_ids":["E001_V0002"],"description":"Synthetic accusation opening.","priority":"high","origin":"synthetic"},
+  {"signal_id":"S2","episode_id":"E001","kind":"reveal","source_event_ids":["E001_V0007"],"description":"Synthetic letter confrontation.","priority":"medium","origin":"synthetic"},
+  {"signal_id":"S3","episode_id":"E001","kind":"open_question","source_event_ids":["E001_V0010"],"description":"Synthetic second-cabinet question.","priority":"high","origin":"synthetic"},
+  {"signal_id":"S4","episode_id":"E001","kind":"cliffhanger","source_event_ids":["E001_V0013"],"description":"Synthetic unexplained knocking.","priority":"high","origin":"synthetic"},
+  {"signal_id":"S5","episode_id":"E001","kind":"cliffhanger","source_event_ids":["E001_V0016"],"description":"Synthetic final warning.","priority":"high","origin":"synthetic"}
+]

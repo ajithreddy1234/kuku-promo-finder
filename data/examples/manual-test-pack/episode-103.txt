@@ -1,0 +1,52 @@
+EPISODE NUMBER: Episode 103
+EPISODE LOGLINE: Invented functional test data only; no real show or footage.
+--- SCRIPT START ---
+SCENE 01
+SCENE HEADING: INT. POLICE RECORDS ROOM - NIGHT
+SCENE START: 00:00.000
+SCENE END: 01:00.000
+**NORA:**
+Start: (00:00.000) | End: (00:05.000)
+"Why is my missing-person report dated tomorrow?"
+
+**ACTION:**
+Start: (00:05.000) | End: (00:10.000)
+Mara lays Nora's notice beside a sealed police file. Both carry the same future date.
+
+**OFFICER MARA:**
+Start: (00:10.000) | End: (00:16.000)
+"I opened this file yesterday. Your name was already inside it."
+
+**ELI:**
+Start: (00:16.000) | End: (00:22.000)
+"Then the room has chosen her. We have until midnight to change it."
+
+**NORA:**
+Start: (00:22.000) | End: (00:28.000)
+"Stop talking about the room. Tell me how to get my father back."
+
+**OFFICER MARA:**
+Start: (00:28.000) | End: (00:34.000)
+"Her father signed every notice in this file. Even the ones printed after he vanished."
+
+**ACTION:**
+Start: (00:34.000) | End: (00:40.000)
+Nora compares the signatures. One page is still wet with ink.
+
+**NORA:**
+Start: (00:40.000) | End: (00:46.000)
+"This one was signed tonight. He has to be here."
+
+**SOUND FX:**
+Start: (00:46.000) | End: (00:51.000)
+Nora's phone rings. The caller name is Dad.
+
+**NORA:**
+Start: (00:51.000) | End: (00:56.000)
+"Dad? Tell me where you are. I am with Officer Mara."
+
+**FATHER ON PHONE:**
+Start: (00:56.000) | End: (01:00.000)
+"Nora, do not let Mara see the last page. She knows why you are next."
+
+--- SCRIPT END ---

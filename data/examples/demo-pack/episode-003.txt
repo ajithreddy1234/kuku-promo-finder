@@ -1,0 +1,35 @@
+EPISODE NUMBER: Episode 3
+EPISODE LOGLINE: Invented software demo only.
+--- SCRIPT START ---
+SCENE 01
+Scene heading: INT. FAMILY BAKERY - NIGHT
+Scene start: 00:00.00
+Scene end: 01:10.00
+**CAMERA:**
+Start: (00:00.00) | End: (01:10.00)
+An invented static scene for software demonstration.
+**OWNER:**
+Start: (00:00.00) | End: (00:04.00)
+"You sold the bakery without telling me?"
+**BROTHER:**
+Start: (00:09.00) | End: (00:13.00)
+"I never signed that contract."
+**OWNER:**
+Start: (00:18.00) | End: (00:22.00)
+"Then why is your signature on it?"
+**BROTHER:**
+Start: (00:27.00) | End: (00:31.00)
+"Look at the date."
+**OWNER:**
+Start: (00:36.00) | End: (00:40.00)
+"Tomorrow. The sale has not happened yet."
+**BROTHER:**
+Start: (00:45.00) | End: (00:49.00)
+"Someone wants us out tonight."
+**OWNER:**
+Start: (00:54.00) | End: (00:58.00)
+"There is a second signature under the fold."
+**BROTHER:**
+Start: (01:03.00) | End: (01:07.00)
+"Wait. Do not read that name aloud."
+--- SCRIPT END ---

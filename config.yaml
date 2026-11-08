@@ -1,0 +1,119 @@
+models:
+  analysis:
+    provider: groq
+    model: openai/gpt-oss-120b
+    max_output_tokens: 2048
+    prompt_version: story-v3-anchors
+  blind:
+    provider: groq
+    model: openai/gpt-oss-20b
+    prompt_version: blind-v5-source-target
+    max_output_tokens: 1536
+  context:
+    provider: groq
+    model: qwen/qwen3.8-27b
+    max_output_tokens: 1024
+    prompt_version: context-v8-compact-source
+    structured_mode: json_object
+    reasoning_effort: none
+  pilot_blind:
+    provider: groq
+    model: qwen/qwen3.8-27b
+    prompt_version: blind-v4-type
+    structured_mode: json_object
+    reasoning_effort: none
+    max_output_tokens: 1024
+  blind_fallback:
+    provider: groq
+    model: openai/gpt-oss-120b
+    prompt_version: blind-v5-source-target
+    max_output_tokens: 1536
+    retry_limit: 0
+batch:
+  respect_evaluation_reservations: false
+  coverage_policy: coverage_first_v2
+  coverage_excluded_episode_numbers: []
+  ai_episode_numbers: []
+  pipeline_version: 2
+  context_limit: 30
+  blind_global_limit: 100
+  stream_preview_limit: 0
+  max_workers: 2
+  fit_review_pool_to_budget: true
+  optional_resolution_normalization: blank_only_v1
+  selected_before_run: true
+  scope: manual_upload
+  auto_episode_limit: null
+inference:
+  prompt_version: thin-slice-v1
+  temperature: 0
+  timeout_seconds: 45
+  max_output_tokens: 4096
+  retry_limit: 1
+  analysis_view: compact_anchors_v2
+quota:
+  enabled: true
+  organization_namespace: single_organization
+  limit_source: conservative_published_defaults_not_console_verified
+  daily_safety_reserve_tokens: 10000
+  max_pacing_wait_seconds: 55
+  evaluation_reserve_by_model: {}
+  models:
+    qwen/qwen3.8-27b:
+      tokens_per_minute: 8000
+      tokens_per_day: 200000
+      requests_per_minute: 20
+      requests_per_day: 1000
+    openai/gpt-oss-120b:
+      tokens_per_minute: 8000
+      tokens_per_day: 200000
+      requests_per_minute: 20
+      requests_per_day: 1000
+    openai/gpt-oss-20b:
+      tokens_per_minute: 8000
+      tokens_per_day: 200000
+      requests_per_minute: 20
+      requests_per_day: 1000
+eligibility:
+  policy_version: v2-require-cliffhanger
+  minimum_hook: 6
+  minimum_cliffhanger: 6
+  minimum_clarity: 6
+promo:
+  min_seconds: 20
+  max_seconds: 60
+  max_segments: 1
+candidates:
+  raw_per_episode: 12
+  assembled_per_episode: 5
+  blind_reviewed_per_episode: 2
+  pruning_policy: semantic_distinct_opening_wildcard_v1
+  near_duplicate_iou: 0.8
+review:
+  editor_policy: editor-v1-fixed-rules
+  blind_fallback_role: blind_fallback
+  context_view: compact_rows_v1
+  context_initial_pool: 20
+  context_additional_cap: 10
+output:
+  ranked_target: 20
+  post_first_target: 10
+  near_tie_tolerance: 0.5
+  duration_margin_warning_ms: 1000
+evaluation:
+  held_out_episode_numbers: []
+  primary_reference_episode_numbers: []
+  development_episode_numbers: []
+  tuning_episode_numbers: []
+  reference_labels_recorded: false
+  baseline_comparison_episode_numbers: []
+  baseline_candidates_per_episode: 2
+  baseline_context_target: 5
+  matching:
+    minimum_time_iou: 0.5
+    editorial_confirmation_required: true
+    count_reference_once: true
+    scope: held_out_sample_only
+diagnostics:
+  gemini_model: gemini-3.1-flash-lite
+  gemini_synthetic_only: true

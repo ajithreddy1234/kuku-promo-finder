@@ -1,0 +1,16 @@
+.git
+.env
+.env.*
+.venv
+**/__pycache__
+.pytest_cache
+runs
+evaluation/private
+data/input
+data/normalized
+web/node_modules
+web/dist
+work
+outputs
+*.zip
+BUILD-LOG.md

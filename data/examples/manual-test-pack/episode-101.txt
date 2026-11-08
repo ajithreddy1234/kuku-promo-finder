@@ -1,0 +1,52 @@
+EPISODE NUMBER: Episode 101
+EPISODE LOGLINE: Invented functional test data only; no real show or footage.
+--- SCRIPT START ---
+SCENE 01
+SCENE HEADING: INT. STORAGE ROOM - NIGHT
+SCENE START: 00:00.000
+SCENE END: 01:00.000
+**NORA:**
+Start: (00:00.000) | End: (00:04.000)
+"That is my father's voice. He disappeared last year."
+
+**ACTION:**
+Start: (00:04.000) | End: (00:08.000)
+Eli pulls an unplugged radio from a locked cabinet. Its red light is still flashing.
+
+**ELI:**
+Start: (00:08.000) | End: (00:14.000)
+"There is no battery. Somebody must be hiding a transmitter nearby."
+
+**NORA:**
+Start: (00:14.000) | End: (00:20.000)
+"The voice says the key is behind us. It knows we are here."
+
+**ACTION:**
+Start: (00:20.000) | End: (00:25.000)
+A brass key slides out from under the cabinet door. Nora reaches toward it.
+
+**ELI:**
+Start: (00:25.000) | End: (00:31.000)
+"Do not touch it. Your father told me what happens when that lock opens."
+
+**NORA:**
+Start: (00:31.000) | End: (00:37.000)
+"You spoke to him? You told me you had never met him."
+
+**ELI:**
+Start: (00:37.000) | End: (00:42.000)
+"I said I had never met him outside this room."
+
+**SOUND FX:**
+Start: (00:42.000) | End: (00:48.000)
+Three deliberate knocks sound from inside the cabinet.
+
+**NORA:**
+Start: (00:48.000) | End: (00:54.000)
+"That is our family code. He used it when he wanted me to hide."
+
+**ACTION:**
+Start: (00:54.000) | End: (01:00.000)
+The cabinet handle turns from the inside. Nora backs toward the only exit.
+
+--- SCRIPT END ---

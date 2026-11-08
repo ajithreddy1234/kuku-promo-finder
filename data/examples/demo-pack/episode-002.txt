@@ -1,0 +1,35 @@
+EPISODE NUMBER: Episode 2
+EPISODE LOGLINE: Invented software demo only.
+--- SCRIPT START ---
+SCENE 01
+Scene heading: INT. TRAIN CONTROL ROOM - NIGHT
+Scene start: 00:00.00
+Scene end: 01:10.00
+**CAMERA:**
+Start: (00:00.00) | End: (01:10.00)
+An invented static scene for software demonstration.
+**DISPATCHER:**
+Start: (00:00.00) | End: (00:04.00)
+"The train has no driver."
+**ENGINEER:**
+Start: (00:09.00) | End: (00:13.00)
+"Then who answered the radio?"
+**DISPATCHER:**
+Start: (00:18.00) | End: (00:22.00)
+"A passenger said the cab was locked."
+**ENGINEER:**
+Start: (00:27.00) | End: (00:31.00)
+"The next station is closed."
+**DISPATCHER:**
+Start: (00:36.00) | End: (00:40.00)
+"I sent the emergency stop signal."
+**ENGINEER:**
+Start: (00:45.00) | End: (00:49.00)
+"It is accelerating."
+**DISPATCHER:**
+Start: (00:54.00) | End: (00:58.00)
+"There is someone calling from the cab now."
+**RADIO:**
+Start: (01:03.00) | End: (01:07.00)
+"Do not open the tunnel gate."
+--- SCRIPT END ---

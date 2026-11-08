@@ -1,0 +1,52 @@
+EPISODE NUMBER: Episode 102
+EPISODE LOGLINE: Invented functional test data only; no real show or footage.
+--- SCRIPT START ---
+SCENE 01
+SCENE HEADING: INT. STORAGE ROOM - CONTINUOUS
+SCENE START: 00:00.000
+SCENE END: 01:00.000
+**NORA:**
+Start: (00:00.000) | End: (00:04.000)
+"That is not my father's hand."
+
+**ACTION:**
+Start: (00:04.000) | End: (00:09.000)
+The cabinet opens two inches. A white-gloved hand holds out Nora's missing-person notice.
+
+**OFFICER MARA:**
+Start: (00:09.000) | End: (00:15.000)
+"Step away from the door. Both of you. Keep your hands where I can see them."
+
+**ELI:**
+Start: (00:15.000) | End: (00:21.000)
+"Officer, the hand has a notice with her face on it. She is standing right here."
+
+**NORA:**
+Start: (00:21.000) | End: (00:27.000)
+"Why does that notice say I disappeared tomorrow?"
+
+**ACTION:**
+Start: (00:27.000) | End: (00:33.000)
+Mara takes the notice without approaching the cabinet. Her hand shakes as she reads it.
+
+**OFFICER MARA:**
+Start: (00:33.000) | End: (00:39.000)
+"Where did you get this? Nobody outside my station has this photograph."
+
+**ELI:**
+Start: (00:39.000) | End: (00:45.000)
+"I told you to stay away from this room, Nora. The notices come first."
+
+**NORA:**
+Start: (00:45.000) | End: (00:50.000)
+"Come before what? Before people disappear?"
+
+**ACTION:**
+Start: (00:50.000) | End: (00:55.000)
+The gloved hand drops a second notice beside Nora's feet. It shows Eli's photograph.
+
+**OFFICER MARA:**
+Start: (00:55.000) | End: (01:00.000)
+"Eli, this says you disappeared ten years ago. Who are you?"
+
+--- SCRIPT END ---
