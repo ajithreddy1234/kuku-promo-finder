@@ -86,7 +86,7 @@ Private source-hash reservations can exclude a particular uploaded source withou
 
 The main result is now a downloadable promo cut sheet: episode, start/end, hook, cliffhanger, why, source warnings and the selected screenplay text. Source-checked editor-flagged rows may be delivered as **draft cuts**, preserving their editor-review status and lack of human approval. Unreviewed, resolved, misleading and timing-invalid rows are not delivered as completed cuts. No edited video is produced; the assignment asks for moments and boundaries only.
 
-When a newly uploaded pack has the exact same episode/source hashes as a saved run, saved source-checked cuts can be reused with explicit originating-run provenance. They are not claimed as new inference by the new run's models. Different source bytes cannot receive those results.
+New uploads do not inherit saved cuts, even when their screenplay bytes match an earlier upload. The app and cut exports show only the selected run's completed evidence. Historical lookup remains available solely as an explicit offline audit argument; no app endpoint enables it. Public request caches belong to each run, so identical new uploads cannot replay another upload's model responses. Resume the same run to continue its own completed work.
 
 Normal new uploads no longer inherit optional benchmark reservations. The `respect_evaluation_reservations` setting enables them for a deliberate evaluation profile; existing pinned runs retain their prior settings. Actual protected reference hashes remain blocked. Source timing exclusions remain in effect.
 

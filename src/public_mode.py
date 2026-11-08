@@ -62,5 +62,5 @@ def destination_key(destination):
 def destination_namespace(destination):
     for path in [destination,*destination.parents]:
         sid=OWNERS.get(path.name)
-        if sid:return 'public_'+hashlib.sha256(sid.encode()).hexdigest()[:20]
+        if sid:return 'public_'+hashlib.sha256(sid.encode()).hexdigest()[:20]+'/'+path.name
     raise ValueError('Public run has no session owner')

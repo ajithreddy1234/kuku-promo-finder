@@ -190,8 +190,21 @@ def get_candidates(pid):
     return sorted(rows,key=lambda r:(0 if r['status']=='ai_eligible' else 1,r.get('rank',999),r['episode_id'],r['start_ms']))
 
 
-def get_promo_cuts(pid,allow_saved=True):
+def get_promo_cuts(pid,allow_saved=False):
     path=project_path(pid);eps=episodes(path)
+    def provenance(values):
+        for cut in values:
+            origin=project_path(cut['origin_project_id'])
+            report_file=origin/'batch/batch_report.json'
+            report=json.loads(report_file.read_text()) if report_file.exists() else {}
+            info_file=origin/'project.json'
+            info=json.loads(info_file.read_text()) if info_file.exists() else {}
+            cut['origin_run_summary']={'id':cut['origin_project_id'],'name':info.get('name','Saved run'),
+                'created_at':info.get('created_at'),
+                'analyzed_episodes':report.get('ai_analyzed_episodes'),
+                'audience_reviews':report.get('blind_reviewed'),
+                'source_checks':report.get('context_reviewed')}
+        return values
     def completed_rows(origin):
         file=decision_view(origin)/'candidate_reviews.json'
         if not file.exists():return []
@@ -205,7 +218,7 @@ def get_promo_cuts(pid,allow_saved=True):
         if cfg.get('review',{}).get('editor_policy'):values=[apply_editor_policy(r) for r in values]
         return values
     cuts=deliverable_cuts(completed_rows(path),eps,pid)
-    if cuts or not allow_saved:return cuts
+    if cuts or not allow_saved:return provenance(cuts)
     # Exact source bytes and episode identity must match. Never carry unrelated
     # show results or claim these as fresh calls by the selected run's models.
     signature=sorted((e.episode_id,e.source_sha256) for e in eps)
@@ -223,8 +236,9 @@ def get_promo_cuts(pid,allow_saved=True):
         cuts=max(matches,key=lambda values:(len(values),values[0]['origin_project_id']))
         for cut in cuts:
             cut['reused_saved_cut']=True
+            cut['exact_source_match_verified']=True
             cut['delivery_note']+=' Reused from a saved run for these exact source files; no new AI call.'
-    return cuts
+    return provenance(cuts)
 
 
 def start_job(pid,selected,profile=None,local_model='llama3.1:8b'):

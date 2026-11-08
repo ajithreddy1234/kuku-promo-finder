@@ -71,3 +71,24 @@ def test_deliberate_shared_server_key_has_shared_quota_namespace(public_client,m
     cfg_b=json.loads((ws.project_path(b['id'])/'config.json').read_text())
     assert cfg_a['quota']['organization_namespace']==cfg_b['quota']['organization_namespace']=='public_shared_organization'
     assert 'gsk_synthetic-shared-not-real' not in one.get('/api/status').text
+
+
+def test_public_identical_uploads_do_not_inherit_old_cuts_or_request_cache(public_client):
+    from test_cut_delivery import seed
+    from src.provider import JsonProvider
+    first=upload(public_client);seed(public_client,first['id'])
+    assert len(public_client.get(f"/api/projects/{first['id']}/promo-cuts").json())==1
+    second=upload(public_client)
+    assert public_client.get(f"/api/projects/{second['id']}/promo-cuts").json()==[]
+    assert public_client.get(f"/api/projects/{second['id']}/export/promo-cuts-json").json()==[]
+    assert len(public_client.get(f"/api/projects/{second['id']}/export/promo-cuts-csv").text.splitlines())==1
+    assert 'No source-checked promo cuts are available yet' in public_client.get(f"/api/projects/{second['id']}/export/promo-cuts-txt").text
+    token=public_mode.CURRENT.set(public_mode.OWNERS[first['id']])
+    try:
+        config={'quota':{'enabled':False}}
+        a=JsonProvider(ws.ROOT,config,ws.project_path(first['id'])/'batch')
+        b=JsonProvider(ws.ROOT,config,ws.project_path(second['id'])/'batch')
+        assert a.cache!=b.cache
+        again=JsonProvider(ws.ROOT,config,ws.project_path(first['id'])/'batch')
+        assert again.cache==a.cache  # resume this run, not replay another upload
+    finally:public_mode.CURRENT.reset(token)

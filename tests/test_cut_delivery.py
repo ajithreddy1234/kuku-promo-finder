@@ -44,11 +44,16 @@ def test_unreviewed_resolved_misleading_and_unsafe_cuts_never_delivered(client):
     assert deliverable_cuts([changed],eps,p['id'])==[]
 
 
-def test_matching_upload_reuses_cut_with_actual_origin_and_no_fake_new_run(client):
+def test_matching_upload_does_not_automatically_reuse_prior_cuts(client):
     original=upload(client);seed(client,original['id']);fresh=upload(client)
     assert fresh['batch'] is None
     cuts=client.get(f"/api/projects/{fresh['id']}/promo-cuts").json()
-    assert len(cuts)==1 and cuts[0]['origin_project_id']==original['id'] and cuts[0]['reused_saved_cut']
+    assert cuts==[]
+    assert client.get(f"/api/projects/{fresh['id']}/export/promo-cuts-json").json()==[]
+    # Offline audit can explicitly inspect an earlier source match. The app
+    # and its exports never opt into this historical lookup.
+    saved=ws.get_promo_cuts(fresh['id'],allow_saved=True)
+    assert len(saved)==1 and saved[0]['origin_project_id']==original['id'] and saved[0]['reused_saved_cut']
     assert not (ws.project_path(fresh['id'])/'batch').exists()
     unrelated=upload(client,'1\n00:00:00,000 --> 00:00:25,000\nAVA: A completely different screenplay.\n')
     assert client.get(f"/api/projects/{unrelated['id']}/promo-cuts").json()==[]
@@ -61,3 +66,19 @@ def test_normal_upload_has_no_optional_evaluation_reservations(client):
     (private/'coverage_reservations.json').write_text(json.dumps({'entries':[{'source_sha256':hashlib.sha256(text.encode()).hexdigest(),'reason':'Optional benchmark reservation'}]}))
     p=upload(client,text,'episode-9.srt')
     assert p['selected_episodes']==[9] and not p['episodes'][0]['reference_reserved']
+
+
+def test_saved_cut_provenance_does_not_increment_current_run_progress(client):
+    original=upload(client);seed(client,original['id'])
+    origin=ws.project_path(original['id'])
+    (origin/'batch/batch_report.json').write_text(json.dumps({'ai_analyzed_episodes':1,'blind_reviewed':1,'context_reviewed':1,'ai_eligible':0}))
+    fresh=upload(client);current=ws.project_path(fresh['id']);(current/'batch').mkdir()
+    (current/'batch/batch_report.json').write_text(json.dumps({'ai_analyzed_episodes':1,'blind_reviewed':0,'context_reviewed':0,'ai_eligible':0}))
+    assert client.get(f"/api/projects/{fresh['id']}/promo-cuts").json()==[]
+    cuts=ws.get_promo_cuts(fresh['id'],allow_saved=True)
+    assert cuts[0]['origin_run_summary']['id']==original['id']
+    assert cuts[0]['origin_run_summary']['audience_reviews']==1
+    assert cuts[0]['exact_source_match_verified'] is True
+    progress=client.get(f"/api/projects/{fresh['id']}").json()['batch']
+    assert progress['blind_reviewed']==0 and progress['context_reviewed']==0
+    assert not list((current/'batch').glob('reviews/**/*.json'))
