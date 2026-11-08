@@ -21,7 +21,9 @@ def test_public_sessions_cannot_list_or_fetch_each_others_uploads(public_client)
     assert {p['id'] for p in one.get('/api/projects').json()}=={first['id']}
     assert {p['id'] for p in two.get('/api/projects').json()}=={second['id']}
     for suffix in ['', '/candidates','/promo-cuts','/export/raw-outputs']:
-        assert two.get(f"/api/projects/{first['id']}"+suffix).status_code==404
+        response=two.get(f"/api/projects/{first['id']}"+suffix)
+        assert response.status_code==404
+        assert response.json()['detail'] and 'application/json' in response.headers['content-type']
     assert 'httponly' in one.get('/api/status').headers['set-cookie'].lower()
 
 

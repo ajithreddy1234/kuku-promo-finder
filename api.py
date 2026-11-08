@@ -10,7 +10,7 @@ import zipfile
 
 from fastapi import FastAPI,UploadFile,File,Form,HTTPException,Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse,Response
+from fastapi.responses import FileResponse,Response,JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel,Field
 from dotenv import dotenv_values
@@ -43,7 +43,7 @@ async def local_mutations(request:Request,call_next):
     try:
         parts=request.url.path.split('/')
         if len(parts)>3 and parts[1:3]==['api','projects'] and not public_mode.visible(parts[3]):
-            response=Response('Project not found in this session.',status_code=404)
+            response=JSONResponse({'detail':'This session expired or the free server restarted. Upload your scripts to start a new run.'},status_code=404)
         else:response=await call_next(request)
         response.set_cookie('promo_session',sid,max_age=3600,httponly=True,secure=request.url.scheme=='https',samesite='strict')
         if request.url.path.startswith('/api/'):
@@ -67,7 +67,7 @@ def status():
     keys=dotenv_values(ws.ROOT/'.env')
     public=public_mode.enabled()
     if public:config['quota']['organization_namespace']=public_mode.namespace()
-    return {'mode':'public_session' if public else 'private_local','result_policy':'current_run_only','public_request_cache_scope':'per_project','release':'groq-only-v1','processing_options':['groq'],
+    return {'mode':'public_session' if public else 'private_local','result_policy':'current_run_only','public_request_cache_scope':'per_project','release':'groq-only-v2','processing_options':['groq'],
         'api_configured':bool(public_mode.current_key()) if public else bool(keys.get('GROQ_API_KEY')),
         'shared_key_configured':bool(public_mode.shared_key()) if public else False,
         'active_jobs':[p for p in ws.ACTIVE if public_mode.visible(p)],'server_busy':bool(ws.ACTIVE),

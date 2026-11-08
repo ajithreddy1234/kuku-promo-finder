@@ -10,8 +10,8 @@ import './simple.css';
 
 async function api(path,options={}){
  const response=await fetch('/api'+path,{...options,headers:{'X-Promo-Client':'studio',...(options.body instanceof FormData?{}:{'Content-Type':'application/json'}),...options.headers}});
- const result=await response.json();
- if(!response.ok)throw new Error(typeof result.detail==='string'?result.detail:'Please check the entered values and try again.');
+ const result=response.headers.get('content-type')?.includes('application/json')?await response.json():{detail:await response.text()};
+ if(!response.ok){const error=new Error(typeof result.detail==='string'?result.detail:'Please check the entered values and try again.');error.status=response.status;throw error;}
  return result;
 }
 const time=(ms=0)=>`${String(Math.floor(ms/60000)).padStart(2,'0')}:${String(Math.floor(ms/1000)%60).padStart(2,'0')}.${String(ms%1000).padStart(3,'0')}`;
@@ -68,7 +68,7 @@ function App(){
    try{
     const p=await api('/projects/'+pid);if(!active)return;setProject(current=>current?.id===p.id?p:current);
     if(p.job?.status==='complete_subset')setStep(current=>current===2?3:current);
-   }catch(e){setError(e.message)}
+   }catch(e){if(e.status===404){localStorage.removeItem('promo-project');setProject(null);setRows([]);setCuts([]);setStep(1);listProjects().catch(()=>{});}setError(e.message)}
   },2500);
   return()=>{active=false;clearInterval(timer)};
  },[pid,project?.job?.status]);
