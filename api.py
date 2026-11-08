@@ -67,7 +67,7 @@ def status():
     keys=dotenv_values(ws.ROOT/'.env')
     public=public_mode.enabled()
     if public:config['quota']['organization_namespace']=public_mode.namespace()
-    return {'mode':'public_session' if public else 'private_local','result_policy':'current_run_only','public_request_cache_scope':'per_project','release':'groq-only-v2','processing_options':['groq'],
+    return {'mode':'public_session' if public else 'private_local','result_policy':'current_run_only','public_request_cache_scope':'per_project','release':'groq-only-v3','processing_options':['groq'],
         'api_configured':bool(public_mode.current_key()) if public else bool(keys.get('GROQ_API_KEY')),
         'shared_key_configured':bool(public_mode.shared_key()) if public else False,
         'active_jobs':[p for p in ws.ACTIVE if public_mode.visible(p)],'server_busy':bool(ws.ACTIVE),

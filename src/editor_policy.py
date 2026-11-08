@@ -14,6 +14,7 @@ def apply_editor_policy(row):
         for field,value in values.items():
             if value=='uncertain':reasons.append(f'{role}_{field}_uncertain')
     if 'partial_camera_record' in row.get('warnings',[]):reasons.append('partial_camera_record')
+    if 'scene_audio_bridge_requires_editor' in row.get('warnings',[]):reasons.append('scene_audio_bridge_requires_editor')
     if 'duration_ms' in row and min(row['duration_ms']-20000,60000-row['duration_ms'])<1000:
         reasons.append('duration_margin_under_1s')
     if kind=='question':reasons.append('question_ending_requires_editor')

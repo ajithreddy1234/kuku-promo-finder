@@ -2,7 +2,9 @@
 from .models import Episode, Issue
 
 CHECK_CODES = {"empty_episode", "missing_scenes", "source_order_differs",
-               "invalid_scene_interval", "outside_scene", "missing_scene_timing"}
+               "invalid_scene_interval", "outside_scene", "missing_scene_timing", "tolerated_scene_audio_overlap"}
+
+AUDIO_BRIDGE_TOLERANCE_MS=500
 
 
 def validate_episode(episode: Episode) -> Episode:
@@ -44,6 +46,17 @@ def validate_episode(episode: Episode) -> Episode:
         for event in (e for e in episode.events if e.scene_id == scene.scene_id):
             if ((scene.start_ms is not None and event.start_ms < scene.start_ms) or
                 (scene.end_ms is not None and event.end_ms > scene.end_ms)):
+                # A short sound cue can bridge a hard scene transition. Keep
+                # every original timestamp; this is a declared interpretation,
+                # not a frame-accurate repair or a tolerance for dialogue cuts.
+                following=next((s for s in episode.scenes if s.scene_id!=scene.scene_id
+                    and s.start_ms==scene.end_ms and s.end_ms is not None),None)
+                if (event.event_type=='sound' and scene.start_ms is not None and scene.end_ms is not None
+                    and scene.start_ms<=event.start_ms<scene.end_ms<event.end_ms
+                    and event.end_ms-scene.end_ms<=AUDIO_BRIDGE_TOLERANCE_MS
+                    and following is not None and event.end_ms<=following.end_ms):
+                    issue('tolerated_scene_audio_overlap',f'{event.event_id}: sound extends {event.end_ms-scene.end_ms} ms into the next contiguous scene; original timestamps preserved, audio check required',line=event.source_line_start)
+                    continue
                 issue("outside_scene", f"{event.event_id} exceeds declared scene range; time base needs inspection",
                       line=event.source_line_start)
                 ambiguous = True

@@ -116,6 +116,35 @@ def test_ambiguous_scene_range_marks_timing_uncertain():
     assert all(e.timing_status=='uncertain' for e in ep.events)
 
 
+@pytest.mark.parametrize('kind,overrun,gap,ready',[('SOUND FX',300,0,True),('SOUND FX',500,0,True),('SOUND FX',501,0,False),('AVA',300,0,False),('SOUND FX',300,100,False)])
+def test_only_short_sound_bridges_between_contiguous_scenes_are_tolerated(kind,overrun,gap,ready):
+    raw=f'''EPISODE NUMBER: Episode 1
+SCENE 01
+SCENE START: 00:00.000
+SCENE END: 00:10.000
+**{kind}:**
+Start: 00:09.000 | End: 00:10.{overrun:03d}
+Invented sound or dialogue.
+SCENE 02
+SCENE START: 00:10.{gap:03d}
+SCENE END: 00:30.000
+**ACTION:**
+Start: 00:11.000 | End: 00:30.000
+An invented scene continues.
+'''.encode()
+    ep=parse_text(raw,'episode-001.txt')
+    assert ep.source_ready is ready
+    assert ep.events[0].end_ms==10000+overrun and ep.scenes[0].end_ms==10000
+    assert any(i.code=='tolerated_scene_audio_overlap' for i in ep.issues) is ready
+    if ready:
+        from src.candidates import make_candidate
+        from src.editor_policy import apply_editor_policy
+        candidate=make_candidate(ep,0,30000)
+        assert 'scene_audio_bridge_requires_editor' in candidate.warnings
+        row=apply_editor_policy({**candidate.model_dump(),'status':'ai_eligible','blind':{'cliffhanger_type':'action'}})
+        assert row['status']=='editor_review' and 'scene_audio_bridge_requires_editor' in row['editor_review_reasons']
+
+
 def test_unknown_json_scene_reference_rejected(tmp_path):
     ep=parse_text(script(),'episode-001.txt').model_dump()
     ep['events'][0]['scene_id']='NONEXISTENT'

@@ -61,6 +61,8 @@ def make_candidate(episode: Episode, start: int, end: int, source="semantic", si
                 if e.event_type == "dialogue" and e.start_ms < end and e.end_ms > start]
     covered = union_duration(dialogue)
     warnings = sorted({f"partial_{e.event_type}_record" for e in content if e.content_status != "full"})
+    if any(i.code=='tolerated_scene_audio_overlap' and i.message.split(':',1)[0] in {e.event_id for e in content} for i in episode.issues):
+        warnings.append('scene_audio_bridge_requires_editor')
     return Candidate(candidate_id=candidate_id or f"{episode.episode_id}_C{digest[:12]}",
                      candidate_version=version, candidate_hash=digest, episode_id=episode.episode_id,
                      start_ms=start, end_ms=end, duration_ms=end-start, source=source,

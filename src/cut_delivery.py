@@ -19,8 +19,12 @@ def deliverable_cuts(rows,episodes,project_id,target=20):
         start,end=row['start_ms'],row['end_ms'];points=usable_boundaries(ep)
         if start not in points or end not in points or not 20000<=end-start<=60000:continue
         cut=deepcopy(row);cut['selected_content']=[e.model_dump() for e in reconstruct(ep,start,end)]
+        if any(i.code=='tolerated_scene_audio_overlap' and i.message.split(':',1)[0] in {e['event_id'] for e in cut['selected_content']} for i in ep.issues):
+            cut['warnings']=sorted(set(cut.get('warnings',[])+['scene_audio_bridge_requires_editor']))
+            cut['editor_review_reasons']=sorted(set(cut.get('editor_review_reasons',[])+['scene_audio_bridge_requires_editor']))
+            cut['status']='editor_review'
         cut['segments']=[{'episode_id':ep.episode_id,'start_ms':start,'end_ms':end}]
-        cut['delivery_kind']='ai_suggestion' if row['status']=='ai_eligible' else 'draft_editor_check'
+        cut['delivery_kind']='ai_suggestion' if cut['status']=='ai_eligible' else 'draft_editor_check'
         cut['origin_project_id']=project_id;cut['source_sha256']=ep.source_sha256
         cut['delivery_note']=('Passed both AI checks; human approval and footage check remain.' if cut['delivery_kind']=='ai_suggestion'
                               else 'Source-checked draft cut. Read the warnings; this is not an AI-approved or human-approved promo.')

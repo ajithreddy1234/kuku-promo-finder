@@ -1,5 +1,9 @@
 # Kuku Promo Finder
 
+Current source policy: a sound cue may bridge at most 500 ms into the next contiguous scene. Original timestamps are preserved; affected cuts require an editor's audio check. Larger overlaps and dialogue/action mismatches remain blocked. This accepts the supplied E022's 300 ms audio bridge, making all 50 episodes source-ready. It does not turn historical 49-episode analysis into a new 50-episode AI run.
+
+The HTML includes a readable overview for reviewers whose viewer cannot execute JavaScript. The interactive upload application still requires JavaScript. Allow roughly a minute for the free host to wake. No previous company results are preloaded.
+
 A local React + FastAPI tool that finds 20–60 second promo selections from timed screenplay files. Code controls timestamps and boundaries; models assess hooks, clarity and unresolved endings.
 
 ## Run
