@@ -89,3 +89,7 @@ The main result is now a downloadable promo cut sheet: episode, start/end, hook,
 When a newly uploaded pack has the exact same episode/source hashes as a saved run, saved source-checked cuts can be reused with explicit originating-run provenance. They are not claimed as new inference by the new run's models. Different source bytes cannot receive those results.
 
 Normal new uploads no longer inherit optional benchmark reservations. The `respect_evaluation_reservations` setting enables them for a deliberate evaluation profile; existing pinned runs retain their prior settings. Actual protected reference hashes remain blocked. Source timing exclusions remain in effect.
+
+## Hosted submission
+
+See [PUBLIC_DEPLOYMENT.md](PUBLIC_DEPLOYMENT.md) and `render.yaml` for the free Docker deployment. The hosted page starts empty, uses server-side Groq configuration, and requires no account login. Anonymous sessions isolate uploads/results. Download the cut sheet or private raw outputs before Clear this session or a free-host restart. No Ollama server is used in deployment.

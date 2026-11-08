@@ -52,11 +52,14 @@ def test_public_model_modes_and_origins_are_restricted(public_client):
 
 def test_clear_removes_only_own_uploads_and_keeps_other_sessions(public_client):
     one=public_client;two=TestClient(api.app);a=upload(one);b=upload(two)
+    cache=ws.ROOT/'runs/_public_cache'/public_mode.destination_namespace(ws.project_path(a['id'])/'batch')
+    cache.mkdir(parents=True);(cache/'private-response.json').write_text('Synthetic cached script text')
     result=one.post('/api/session/clear',headers=H)
     assert result.status_code==200 and result.json()['quota_reset'] is False
     assert one.get('/api/projects').json()==[]
     assert two.get('/api/projects').json()[0]['id']==b['id']
     assert not (ws.WORKSPACES/a['id']).exists() and (ws.WORKSPACES/b['id']).exists()
+    assert not cache.exists()
 
 
 def test_deliberate_shared_server_key_has_shared_quota_namespace(public_client,monkeypatch):

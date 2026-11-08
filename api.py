@@ -93,10 +93,13 @@ def clear_session():
     if not public_mode.enabled():raise HTTPException(404,'Public session mode is disabled')
     owned=[pid for pid in public_mode.OWNERS if public_mode.visible(pid)]
     if set(owned)&ws.ACTIVE:raise ValueError('Wait for processing to finish or pause before clearing this session.')
+    caches=set()
     for pid in owned:
         folder=ws.project_path(pid)
+        caches.add(ws.ROOT/'runs/_public_cache'/public_mode.destination_namespace(folder/'batch'))
         shutil.rmtree(folder)
         public_mode.OWNERS.pop(pid,None)
+    for folder in caches:shutil.rmtree(folder,ignore_errors=True)
     public_mode.SESSIONS[public_mode.CURRENT.get()]['key']=None
     # Quota history is retained: clearing uploads must not reset usage accounting.
     return {'cleared_projects':len(owned),'quota_reset':False}
