@@ -23,21 +23,20 @@ function App(){
  const [step,setStep]=useState(1),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
  const [rows,setRows]=useState([]),[cuts,setCuts]=useState([]),[loadingRows,setLoadingRows]=useState(false),[chosen,setChosen]=useState([]);
  const [savedOpen,setSavedOpen]=useState(false),[advanced,setAdvanced]=useState(null),[help,setHelp]=useState(false);
- const [profile,setProfile]=useState('groq'),[localModel,setLocalModel]=useState('llama3.1:8b');
  const [plan,setPlan]=useState(null);
  const [reviewTier,setReviewTier]=useState('promo_cuts'),[tierLimit,setTierLimit]=useState(12);
  const [visitorKey,setVisitorKey]=useState('');
  const pid=project?.id;
  useEffect(()=>{
   setPlan(null);if(!pid||!chosen.length||project?.batch)return;
-  let alive=true;const timer=setTimeout(()=>api(`/projects/${pid}/plan`,{method:'POST',body:JSON.stringify({episode_numbers:chosen,profile,local_model:localModel})}).then(p=>alive&&setPlan(p)).catch(()=>{}),300);
+  let alive=true;const timer=setTimeout(()=>api(`/projects/${pid}/plan`,{method:'POST',body:JSON.stringify({episode_numbers:chosen,profile:'groq'})}).then(p=>alive&&setPlan(p)).catch(()=>{}),300);
   return()=>{alive=false;clearTimeout(timer)};
- },[pid,chosen,profile,localModel,!!project?.batch]);
+ },[pid,chosen,!!project?.batch]);
  async function listProjects(){const p=await api('/projects');setProjects(p);return p;}
  async function openProject(id,preferred){
   setError('');setBusy(true);
   try{
-   const [p,saved]=await Promise.all([api('/projects/'+id),api(`/projects/${id}/promo-cuts`)]);setProject(p);setChosen(p.selected_episodes);setRows([]);setCuts(saved);setReviewTier('promo_cuts');setProfile(p.processing_profile||'groq');if(p.local_model)setLocalModel(p.local_model);
+   const [p,saved]=await Promise.all([api('/projects/'+id),api(`/projects/${id}/promo-cuts`)]);setProject(p);setChosen(p.selected_episodes);setRows([]);setCuts(saved);setReviewTier('promo_cuts');
    localStorage.setItem('promo-project',p.id);setSavedOpen(false);
    setStep(preferred??(saved.length||p.batch?.status==='complete_subset'?3:2));
   }catch(e){setError(e.message)}finally{setBusy(false)}
@@ -50,7 +49,7 @@ function App(){
    if(saved&&!ps.some(p=>p.id===saved))localStorage.removeItem('promo-project');
    if(saved&&ps.some(p=>p.id===saved)){
     const p=await api('/projects/'+saved);
-    if(alive){setProject(p);setChosen(p.selected_episodes);setProfile(p.processing_profile||'groq');if(p.local_model)setLocalModel(p.local_model)}
+    if(alive){setProject(p);setChosen(p.selected_episodes);}
    }
   }).catch(e=>alive&&setError(e.message));
   return()=>{alive=false};
@@ -73,12 +72,12 @@ function App(){
   },2500);
   return()=>{active=false;clearInterval(timer)};
  },[pid,project?.job?.status]);
- async function imported(p){setProject(p);setChosen(p.selected_episodes);setProfile(p.processing_profile||'groq');setRows([]);setCuts([]);setReviewTier('promo_cuts');setError('');localStorage.setItem('promo-project',p.id);setStep(2);setNotice('New upload ready. No results from another run have been added. Click Find promos to process these scripts.');await listProjects();}
+ async function imported(p){setProject(p);setChosen(p.selected_episodes);setRows([]);setCuts([]);setReviewTier('promo_cuts');setError('');localStorage.setItem('promo-project',p.id);setStep(2);setNotice('New upload ready. No results from another run have been added. Click Find promos to process these scripts.');await listProjects();}
  async function freshRun(){setBusy(true);setError('');try{await imported(await api(`/projects/${pid}/new-run`,{method:'POST'}));setNotice('New run ready. All usable episodes are selected. Your previous run is still in Saved work.')}catch(e){setError(e.message)}finally{setBusy(false)}}
  async function analyze(){
   setBusy(true);setError('');
   try{
-   await api(`/projects/${pid}/jobs`,{method:'POST',body:JSON.stringify({episode_numbers:chosen,profile,local_model:localModel})});
+   await api(`/projects/${pid}/jobs`,{method:'POST',body:JSON.stringify({episode_numbers:chosen,profile:'groq'})});
    setProject(await api('/projects/'+pid));
   }catch(e){setError(e.message)}finally{setBusy(false)}
  }
@@ -93,7 +92,7 @@ function App(){
  const kept=[...new Map([...rows,...cuts].filter(r=>r.editor_note?.verdict==='accept').map(r=>[r.candidate_id,r])).values()];
  const hasRun=!!project?.batch;
  const available=project?.episodes.filter(e=>e.source_ready&&!e.reference_reserved)||[];
- const connected=profile==='local'?(server?.local_models||[]).includes(localModel):profile==='hybrid'?server?.api_configured&&(server?.local_models||[]).includes(localModel):server?.api_configured;
+ const connected=server?.api_configured;
  function move(n){setStep(n);setError('');setNotice('');}
  return <div className="simple-app">
   <header className="simple-header">
@@ -123,13 +122,13 @@ function App(){
       <div className="episode-scope" role="group" aria-label="Episode selection"><button disabled={hasRun||running} aria-pressed={chosen.length===available.length} onClick={()=>setChosen(available.map(e=>e.number))}>Analyze all {available.length} usable episodes</button><button disabled={hasRun||running} onClick={()=>{setChosen([]);document.getElementById('episode-picker').open=true}}>Choose episodes myself</button></div>
       <p className="s-note">{chosen.length===available.length?'Whole-show search: every usable episode will be read, then promising clips will be compared across the show.':'Selected-episode search: results cover this selection, so they cannot establish the best promos across the whole show.'}</p>
       <details id="episode-picker" className="s-details"><summary>See or change selected episodes</summary><div className="episode-choices">{project.episodes.map(e=><label key={e.id}><input type="checkbox" checked={chosen.includes(e.number)} disabled={!!project.batch||running||!e.source_ready||e.reference_reserved} onChange={()=>setChosen(values=>values.includes(e.number)?values.filter(n=>n!==e.number):[...values,e.number])}/><span><strong>Episode {e.number}</strong><small>{e.reference_reserved?'Set aside for a quality test':!e.source_ready?'Timing needs fixing':e.filename}</small></span></label>)}</div></details>
-      {!hasRun&&<div className="processing-choice"><label className="s-field">Where should analysis run?<select aria-label="Processing mode" value={profile} onChange={e=>setProfile(e.target.value)}><option value="groq">Groq · faster model responses, free usage limits</option><option value="hybrid" disabled={!server?.local_models?.length||!server?.api_configured}>Hybrid · local story analysis, Groq clip reviews</option><option value="local" disabled={!server?.local_models?.length}>On this Mac · no API key or daily quota</option></select></label>{profile!=='groq'?<><label className="s-field">Installed local model<select value={localModel} onChange={e=>setLocalModel(e.target.value)}>{(server?.local_models||[]).map(m=><option key={m} value={m}>{m}</option>)}</select></label><p className="s-note">{profile==='hybrid'?'Episode analysis stays local. Selected clips and related source evidence go to Groq for audience and context reviews. This reduces cloud usage; local analysis quality still needs your inspection.':'Your scripts stay on this Mac. Processing can be slower, and all reviews use the same model. Treat the results as exploratory until you inspect them.'}</p></>:<p className="s-note">Scripts go to your configured Groq account. The app saves progress and pauses safely if capacity runs out.</p>}<p className="s-fineprint">Every selected episode is analysed. Audience reviews cover different episodes before second cuts, up to two per episode within the usage budget. Up to 30 clips receive source checks; up to 20 passing suggestions are ranked. Unreviewed clips are not rejected.</p></div>}
+      {!hasRun&&<div className="processing-choice"><p className="s-note"><strong>Groq cloud processing</strong><br/>Your selected scripts go to the configured Groq account. No model installation is required. Completed work is saved if a usage limit pauses the run.</p><p className="s-fineprint">Every selected episode is analyzed. Candidate reviews cover different episodes before additional cuts, within the usage budget. Only source-checked cuts appear in downloads.</p></div>}
       {running?<RunProgress project={project}/>:<>
-       {plan?.analysis_estimate_fits===false&&<div className="s-alert warning"><Info size={17}/><span>This selection is likely to pause at the Groq analysis usage limit. Hybrid mode moves episode analysis onto this Mac; local mode removes API quota waits. Neither guarantees faster processing or equal quality.</span></div>}
+       {plan?.analysis_estimate_fits===false&&<div className="s-alert warning"><Info size={17}/><span>This selection may exceed the remaining Groq allowance. Choose fewer episodes for a shorter test, or continue the same run when capacity becomes available.</span></div>}
        {project.job&&<div className="s-alert warning"><Info size={17}/><span>{project.job.status==='paused_budget'||project.job.status==='paused'?'The free usage limit paused this run. Your completed work is saved. Continue when capacity is available.':project.job.message}</span></div>}
        <Button disabled={busy||!chosen.length||!connected} onClick={analyze}>{busy?<Loader2 className="spin" size={17}/>:<Scissors size={17}/>} {project.batch?'Continue this saved run':`Find promos in ${plural(chosen.length,'episode')}`}</Button>
        <p className="s-fineprint">Analysis starts only when you click. Completed work is saved for resume.</p>
-       {!connected&&<div className="s-alert warning">{server?.mode==='public_session'?'Connect your Groq key above to process your upload. No login is needed.':profile==='local'?'The selected local model is unavailable. Choose an installed model.':'Add your Groq key to the backend .env, or choose an available local model.'}</div>}
+       {!connected&&<div className="s-alert warning">{server?.mode==='public_session'?'Connect your Groq key above to process your upload. No login is needed.':'Add your Groq key to the backend .env to process scripts.'}</div>}
       </>}
      </>}
      {hasRun&&!running&&!project.saved_read_only&&<div className="new-run-choice"><p>Want all episodes, a different selection or the updated pipeline? Start a separate run from these same uploaded scripts.</p><Button secondary disabled={busy} onClick={freshRun}>Start a new run<Plus size={16}/></Button><small>Your existing results and original model settings are preserved.</small></div>}
@@ -197,7 +196,7 @@ function ScriptIssues({project}){
 }
 function RunProgress({project}){
  const stage=project.batch?.stage||'prepare';const phase=stage.startsWith('context')?2:stage.startsWith('blind')?1:0;
- return <div className="simple-progress" role="status"><Loader2 className="spin" size={23}/><strong>{['Reading the story','Checking possible promos','Checking the source and preparing results'][phase]}</strong><p>{project.batch?.ai_analyzed_episodes||0} / {project.selected_episodes.length} selected episodes analysed · {project.batch?.blind_reviewed||0} audience reviews · {project.batch?.context_reviewed||0} source checks</p><p>{project.processing_profile==='local'?'Running on this Mac. Keep the app server running.':'Free usage limits can add a waiting period. Completed work is saved automatically.'}</p><ol>{['Read selected episodes','Review possible clips','Prepare your suggestions'].map((s,i)=><li className={i===phase?'working':i<phase?'done':''} key={s}>{i<phase?<Check size={14}/>:<span>{i+1}</span>}{s}</li>)}</ol><p>{project.job?.message}</p></div>;
+ return <div className="simple-progress" role="status"><Loader2 className="spin" size={23}/><strong>{['Reading the story','Checking possible promos','Checking the source and preparing results'][phase]}</strong><p>{project.batch?.ai_analyzed_episodes||0} / {project.selected_episodes.length} selected episodes analysed · {project.batch?.blind_reviewed||0} audience reviews · {project.batch?.context_reviewed||0} source checks</p><p>Free usage limits can add a waiting period. Completed work is saved automatically.</p><ol>{['Read selected episodes','Review possible clips','Prepare your suggestions'].map((s,i)=><li className={i===phase?'working':i<phase?'done':''} key={s}>{i<phase?<Check size={14}/>:<span>{i+1}</span>}{s}</li>)}</ol><p>{project.job?.message}</p></div>;
 }
 function SourceReader({pid,episodes}){
  const [eid,setEid]=useState(episodes[0]?.id||''),[source,setSource]=useState(null),[error,setError]=useState('');

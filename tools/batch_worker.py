@@ -15,15 +15,14 @@ def main():
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--config',type=Path,default=root/'config.yaml')
     parser.add_argument('--max-minutes',type=int,default=45)
-    parser.add_argument('--profile',choices=['groq','hybrid','local'])
-    parser.add_argument('--local-model',default='llama3.1:8b')
+    parser.add_argument('--profile',choices=['groq'],default='groq')
     parser.add_argument('--episodes',help='Comma-separated episode numbers, or all (default: all usable episodes)')
     args=parser.parse_args()
     if not args.output.resolve().is_relative_to(root/'runs'):parser.error('Private output must be in project runs/')
     config=yaml.safe_load(args.config.read_text())
     if args.profile:
         from src.profiles import apply_profile
-        config=apply_profile(config,args.profile,args.local_model)
+        config=apply_profile(config,args.profile)
     if args.episodes:config['batch']['ai_episode_numbers']=[] if args.episodes=='all' else [int(n) for n in args.episodes.split(',')]
     episodes,report=ingest(args.input)
     args.output.mkdir(parents=True,exist_ok=True)

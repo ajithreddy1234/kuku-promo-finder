@@ -1,6 +1,6 @@
 # Public deployment
 
-The hosted app runs the same React/FastAPI source and evidence pipeline. No Ollama process is needed on the server. No user account registration is required. Browser sessions isolate project listings, source, exports and model-response caches.
+The hosted app runs the same React/FastAPI source and evidence pipeline. Groq is the only inference provider; local and hybrid options are removed from the UI, API and CLI. No user account registration is required. Browser sessions isolate project listings, source, exports and model-response caches.
 
 ## Render Free
 

@@ -41,13 +41,11 @@ Invented source fixtures are in data/examples/manual-test-pack. They contain no 
 
 ## AI and keys
 
-Set GROQ_API_KEY in the backend .env; never in React or a VITE variable. Roles remain pinned per run. Choose:
+Set GROQ_API_KEY in the backend .env or hosting secret settings, never in React or a VITE variable. All new processing uses Groq: OSS120b analyzes episodes, OSS20b reviews isolated clips, and Qwen 3.8 27B checks context. The roles have separate model budgets. Free daily capacity is finite.
 
-- Groq: OSS120b analyses episodes, OSS20b reviews isolated clips, and Qwen 3.8 27B checks context. The roles use separate model budgets. Fast responses do not guarantee sufficient free daily capacity.
-- Hybrid: an installed local Ollama model analyses episodes; Groq OSS20b reviews clips and Qwen 3.8 27B checks context. This saves cloud analysis quota. Local discovery quality and free review capacity remain limitations.
-- Local: all roles run through an installed local Ollama model. No API key or inference-service bill; hardware/electricity are still needed. Reviews use the same model and are exploratory. This is not guaranteed to be faster or equally capable.
+There is no processing-mode selector, installed-model discovery, hybrid option or local inference endpoint. The API and CLI reject unsupported modes. Historical artifacts retain their original model provenance; they are not replayed into new uploads.
 
-The app lists installed local models; it does not download models. Cloud-tagged Ollama models are rejected, and local requests use only 127.0.0.1. Structured output, exact source anchors and exact threat-target quotations are validated. The consequence-target audit is supplemented by a conservative relationship-paraphrase warning; no model judge is a guarantee of factual correctness.
+Structured output, exact source anchors and threat-target quotations are validated. Consequence checks and a conservative relationship-paraphrase warning supplement source review; no model judgment guarantees correctness.
 
 Eligibility policy v2 rejects `cliffhanger_type: none` even when scores are high, and routes an uncertain type to editor review. Offline policy rechecks retain original responses/scores and identify the policy version separately. Coverage-first allocation is implemented: highest discovery priority, then complete source records, fewer boundary warnings, a larger duration margin and stable timestamps/IDs. The first pass prefers different episodes before expansions, and re-stratifies after a budget reduction. Reports distinguish 43 eligible episodes from the number actually reviewed; reserved/exposed inputs are excluded by source-bound policy. Full three-lane overlap is deferred.
 
@@ -57,7 +55,7 @@ Gemini is optional for synthetic diagnostics only and is not used on confidentia
 
 Local per-project JSON/JSONL stores source timelines, review evidence, editor decisions and checkpoints. No external database is required. Exact-request caching and an org/model quota ledger protect free capacity. Real prior usage remains accounted after clearing app state. Published free limits are planning assumptions, not account-console verification. A fifty-episode full AI run is not guaranteed to fit one free quota window.
 
-Uploads, source validation and the pre-run capacity estimate work without hosted inference. A Groq/hybrid run needs the backend key and capacity; local mode needs a running local Ollama service and installed model. Cached input is excluded from quota charges only when reported by the provider. Unknown historical usage stays conservatively charged. No paid tier was activated. Deployment and an external database are optional; localhost alone is not an accessible submission link.
+Uploads, source validation and the pre-run capacity estimate work without hosted inference. Processing needs the configured Groq key and available capacity. Cached input is excluded from quota charges only when reported by the provider. Unknown historical usage stays conservatively charged. No paid tier was activated. Deployment and an external database are optional; localhost alone is not an accessible submission link.
 
 ## Checks and CLI
 
@@ -67,18 +65,18 @@ npm --prefix web ci
 npm --prefix web run build
 uv run python run.py --input data/examples/manual-test-pack --output runs/check-input
 uv run python -m tools.batch_worker --input /path/to/episodes.zip --output runs/my-run --max-minutes 30
-uv run python -m tools.batch_worker --input /path/to/episodes.zip --output runs/my-hybrid-run --profile hybrid --episodes all --max-minutes 45
+uv run python -m tools.batch_worker --input /path/to/episodes.zip --output runs/my-run --profile groq --episodes all --max-minutes 45
 ```
 
-Groq and hybrid commands consume inference quota. Empty batch selection derives all episode numbers from the input, excluding only explicitly reserved references and unusable timing. Repeat the same command to resume; changed input/model/config needs a new run. Use --episodes 1,5,12 for an explicitly limited subset.
+Processing commands consume Groq inference quota. Empty batch selection derives all episode numbers from the input, excluding only explicitly reserved references and unusable timing. Repeat the same command to resume; changed input/model/config needs a new run. Use --episodes 1,5,12 for an explicitly limited subset.
 
-Keep .env, runs, labels, the original pack and real source quotations out of public Git. The app is a private local prototype, not an authenticated public multi-user service. It finds continuous source clips; footage editing, stitching, OCR and ad-performance prediction are outside this version.
+Keep .env, runs, labels, the original pack and real source quotations out of public Git. The deployed prototype isolates anonymous browser sessions without account registration. It finds continuous source clips; footage editing, stitching, OCR and ad-performance prediction are outside this version.
 
 ## Fixed editor routing and review recovery
 
 The main review desk has AI suggestions, Needs your judgment, and Not reviewed yet. A question ending, partial camera record, duration margin below one second, any uncertain review field, or a backup-only judgment goes to editor review when it otherwise passes. A missing cliffhanger remains rejected. Failed/capacity-limited requests stay unfinished, never quality-rejected.
 
-Two exhausted primary audience attempts allow one attempt on the configured backup with the identical frozen prompt/schema. `judged_by` records actual models; backup-only scores stay outside the homogeneous primary ranking. Local-only mode disables the cloud backup. Successes and attempt limits survive resume.
+Two exhausted primary audience attempts allow one attempt on the configured backup with the identical frozen prompt/schema. `judged_by` records actual models; backup-only scores stay outside the homogeneous primary ranking. Successes and attempt limits survive resume.
 
 Private source-hash reservations can exclude a particular uploaded source without reserving the same episode number in unrelated shows. A reservation made after analysis does not establish held-out independence. Human labels, a matched baseline and the failure log remain separate quality evidence; no human labels or baseline improvement are fabricated.
 
@@ -92,4 +90,4 @@ Normal new uploads no longer inherit optional benchmark reservations. The `respe
 
 ## Hosted submission
 
-See [PUBLIC_DEPLOYMENT.md](PUBLIC_DEPLOYMENT.md) and `render.yaml` for the free Docker deployment. The hosted page starts empty, uses server-side Groq configuration, and requires no account login. Anonymous sessions isolate uploads/results. Download the cut sheet or private raw outputs before Clear this session or a free-host restart. No Ollama server is used in deployment.
+See [PUBLIC_DEPLOYMENT.md](PUBLIC_DEPLOYMENT.md) and `render.yaml` for the free Docker deployment. The hosted page starts empty, uses server-side Groq configuration, and requires no account login. Anonymous sessions isolate uploads/results. Download the cut sheet or private raw outputs before Clear this session or a free-host restart. Only Groq processing is enabled.

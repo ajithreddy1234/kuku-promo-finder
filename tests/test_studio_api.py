@@ -192,11 +192,14 @@ def test_new_run_preserves_original_results_and_selects_all_again(client):
     assert json.loads((batch/'sentinel.json').read_text())=={'unchanged':True}
 
 
-def test_local_mode_does_not_require_a_groq_key(client,monkeypatch):
+def test_removed_processing_options_are_rejected(client,monkeypatch):
     p=upload(client);calls=[]
     monkeypatch.setattr(ws,'start_job',lambda *args:calls.append(args))
-    r=client.post(f"/api/projects/{p['id']}/jobs",headers=H,json={'episode_numbers':[73],'profile':'local','local_model':'installed:8b'})
-    assert r.status_code==200 and calls==[(p['id'],[73],'local','installed:8b')]
+    for profile in ('local','hybrid'):
+        for endpoint in ('jobs','plan'):
+            r=client.post(f"/api/projects/{p['id']}/{endpoint}",headers=H,json={'episode_numbers':[73],'profile':profile})
+            assert r.status_code==400 and 'Only Groq' in r.text
+    assert calls==[]
 
 
 def test_private_raw_export_contains_source_and_results_but_no_environment(client):

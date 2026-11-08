@@ -46,7 +46,8 @@ def test_public_model_modes_and_origins_are_restricted(public_client):
     p=upload(public_client)
     r=public_client.post(f"/api/projects/{p['id']}/jobs",headers=H,json={'episode_numbers':[73],'profile':'local'})
     assert r.status_code==400
-    assert public_client.get('/api/status').json()['local_models']==[]
+    status=public_client.get('/api/status').json()
+    assert status['processing_options']==['groq'] and 'local_models' not in status
     assert public_client.post('/api/session/key',headers={**H,'origin':'https://unrelated.example'},json={'api_key':'gsk_synthetic-not-real'}).status_code==403
 
 

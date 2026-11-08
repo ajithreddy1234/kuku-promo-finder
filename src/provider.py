@@ -59,22 +59,8 @@ class JsonProvider:
             handle.write(json.dumps(value,ensure_ascii=False)+'\n')
 
     def _network(self, model_config, messages, schema, settings):
-        if model_config['provider']=='ollama':
-            import httpx
-            model=model_config['model']
-            if 'cloud' in model.lower():raise ProviderFailure('Only installed local Ollama models are allowed; cloud tags are disabled')
-            with httpx.Client(base_url='http://127.0.0.1:11434',timeout=settings['timeout_seconds']) as client:
-                result=client.post('/api/chat',json={'model':model,'messages':messages,'stream':False,
-                    'format':schema,'keep_alive':'10m','options':{'temperature':settings['temperature'],
-                        'num_ctx':model_config.get('context_tokens',8192),'num_predict':settings['max_output_tokens']}})
-                result.raise_for_status();data=result.json()
-            usage={'prompt_tokens':data.get('prompt_eval_count'),'completion_tokens':data.get('eval_count')}
-            if all(isinstance(v,int) for v in usage.values()):usage['total_tokens']=sum(usage.values())
-            return {'choices':[{'finish_reason':'stop' if data.get('done_reason')=='stop' else 'length',
-                                'message':{'content':data.get('message',{}).get('content')}}],
-                    'usage':usage,'local_only':True},{}
         if model_config['provider']!='groq':
-            raise ProviderFailure('Real confidential inference is configured for Groq only; no automatic provider fallback')
+            raise ProviderFailure('Processing supports Groq only; no local model runtime is enabled')
         from groq import Groq
         keys=dotenv_values(self.root/'.env')
         key=public_mode.destination_key(self.destination) if public_mode.enabled() else keys.get('GROQ_API_KEY')

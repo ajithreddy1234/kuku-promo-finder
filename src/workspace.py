@@ -58,6 +58,7 @@ def coverage_reservations():
 
 def project_config(eps):
     config=yaml.safe_load((ROOT/'config.yaml').read_text())
+    config['batch']['processing_profile']='groq'
     if public_mode.enabled():
         config['quota']['organization_namespace']=public_mode.namespace()
         config['batch']['processing_profile']='groq'
@@ -148,7 +149,6 @@ def metadata(pid):
         'format':e.metadata.get('input_format','txt')} for e in eps],
         'selected_episodes':cfg['batch']['ai_episode_numbers'],'job':job,'batch':batch,
         'processing_profile':cfg['batch'].get('processing_profile','groq'),
-        'local_model':cfg['models']['analysis']['model'] if cfg['models']['analysis']['provider']=='ollama' else None,
         'pipeline_version':cfg['batch'].get('pipeline_version',1),
         'models':{r:cfg['models'][r]['model'] for r in ('analysis','blind','context')},'saved_read_only':pid=='assignment'}
 
@@ -241,15 +241,17 @@ def get_promo_cuts(pid,allow_saved=False):
     return provenance(cuts)
 
 
-def start_job(pid,selected,profile=None,local_model='llama3.1:8b'):
+def start_job(pid,selected,profile=None):
     path=project_path(pid)
     if pid=='assignment':raise ValueError('Saved discovery is immutable. Upload scripts to create a new working project.')
     config=json.loads((path/'config.json').read_text())
+    if profile not in (None,'groq') or any(config['models'][r]['provider']!='groq' for r in ('analysis','blind','context')):
+        raise ValueError('Only Groq processing is supported. Start a new run for historical results.')
     eps=episodes(path);allowed={e.episode_number for e in eps if e.source_ready and e.source_sha256 not in protected_hashes() and e.episode_number not in excluded_numbers(config)}
     if not selected or len(selected)!=len(set(selected)) or not set(selected)<=allowed:raise ValueError('Choose valid, non-reference source-ready episodes.')
     config['batch']['ai_episode_numbers']=sorted(selected)
     manifest=path/'batch/manifest.json'
-    if profile and not manifest.exists():config=apply_profile(config,profile,local_model)
+    if profile and not manifest.exists():config=apply_profile(config,profile)
     elif profile and profile!=config['batch'].get('processing_profile','groq'):
         raise ValueError('The model is pinned for this run. Start a new run to change processing mode.')
     if manifest.exists() and json.loads(manifest.read_text())['config_hash']!=config_hash(config):

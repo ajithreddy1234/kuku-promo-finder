@@ -21,7 +21,6 @@ from src.budget import BudgetLedger
 from src.evaluation import ReferenceBundle,ReferenceEntry,ReferenceSelection,validate_references
 from src.timeline import reconstruct
 from src.candidates import make_candidate
-from src.profiles import local_models
 from src.cut_delivery import cut_text
 from src.timeline import format_time
 from src import public_mode
@@ -68,12 +67,11 @@ def status():
     keys=dotenv_values(ws.ROOT/'.env')
     public=public_mode.enabled()
     if public:config['quota']['organization_namespace']=public_mode.namespace()
-    return {'mode':'public_session' if public else 'private_local','result_policy':'current_run_only','public_request_cache_scope':'per_project','release':'fresh-upload-v1',
+    return {'mode':'public_session' if public else 'private_local','result_policy':'current_run_only','public_request_cache_scope':'per_project','release':'groq-only-v1','processing_options':['groq'],
         'api_configured':bool(public_mode.current_key()) if public else bool(keys.get('GROQ_API_KEY')),
         'shared_key_configured':bool(public_mode.shared_key()) if public else False,
         'active_jobs':[p for p in ws.ACTIVE if public_mode.visible(p)],'server_busy':bool(ws.ACTIVE),
         'quota':BudgetLedger(ws.ROOT,config).snapshot(),
-        'local_models':[] if public else local_models(),
         'formats':['ZIP','TXT','MD','SRT','VTT','CSV','JSON','DOCX','text PDF']}
 
 @app.get('/api/health')
@@ -150,15 +148,14 @@ def promo_cuts(pid:str):path(pid);return ws.get_promo_cuts(pid)
 class JobInput(BaseModel):
     episode_numbers:list[int]
     profile:str|None=None
-    local_model:str='llama3.1:8b'
 
 @app.post('/api/projects/{pid}/plan')
 def capacity_plan(pid:str,body:JobInput):
     from src.capacity import plan_run
     from src.profiles import apply_profile
     p=path(pid);config=json.loads((p/'config.json').read_text())
-    if public_mode.enabled() and body.profile not in (None,'groq'):raise ValueError('Public processing uses your Groq account; Ollama runs only in the local app.')
-    if not (p/'batch/manifest.json').exists():config=apply_profile(config,body.profile or 'groq',body.local_model)
+    if body.profile not in (None,'groq'):raise ValueError('Only Groq processing is supported.')
+    if not (p/'batch/manifest.json').exists():config=apply_profile(config,body.profile or 'groq')
     return plan_run(ws.ROOT,ws.episodes(p),config,body.episode_numbers)
 
 @app.post('/api/projects/{pid}/new-run')
@@ -170,11 +167,11 @@ def new_run(pid:str):
 def run(pid:str,body:JobInput):
     path(pid)
     profile=body.profile or ws.metadata(pid)['processing_profile']
-    if public_mode.enabled() and profile!='groq':raise ValueError('Choose Groq processing on the hosted prototype.')
+    if profile!='groq':raise ValueError('Only Groq processing is supported. Start a new run for historical results.')
     key=public_mode.project_key(pid) if public_mode.enabled() else dotenv_values(ws.ROOT/'.env').get('GROQ_API_KEY')
-    if profile in ('groq','hybrid') and not key:raise ValueError('Add your Groq key in this browser session.' if public_mode.enabled() else 'Groq API key is missing from the local backend .env.')
+    if not key:raise ValueError('Add your Groq key in this browser session.' if public_mode.enabled() else 'Groq API key is missing from the backend .env.')
     if body.profile is None:ws.start_job(pid,body.episode_numbers)
-    else:ws.start_job(pid,body.episode_numbers,profile,body.local_model)
+    else:ws.start_job(pid,body.episode_numbers,profile)
     return {'status':'started'}
 
 class EditorNote(BaseModel):

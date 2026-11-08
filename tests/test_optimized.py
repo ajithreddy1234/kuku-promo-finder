@@ -163,10 +163,10 @@ def test_consequence_target_mismatch_cannot_pass_even_with_high_scores():
     assert review_decision(candidate,blind,context,mapping,c,[])['status']=='rejected'
 
 
-def test_cloud_tag_cannot_be_used_as_a_local_model(tmp_path):
+def test_non_groq_network_provider_is_disabled(tmp_path):
     from src.provider import JsonProvider,ProviderFailure
     c,_=setup(1);api=JsonProvider(tmp_path,c,tmp_path/'logs',transport=lambda *a:None)
-    with pytest.raises(ProviderFailure,match='cloud tags'):
+    with pytest.raises(ProviderFailure,match='Groq only'):
         api._network({'provider':'ollama','model':'anything:cloud'},[],{},c['inference'])
 
 
